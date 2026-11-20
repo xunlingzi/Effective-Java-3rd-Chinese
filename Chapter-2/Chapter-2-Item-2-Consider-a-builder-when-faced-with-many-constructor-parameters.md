@@ -4,7 +4,7 @@
 
 Static factories and constructors share a limitation: they do not scale well to large numbers of optional parameters. Consider the case of a class representing the Nutrition Facts label that appears on packaged foods. These labels have a few required fields—serving size, servings per container, and calories per serving— and more than twenty optional fields—total fat, saturated fat, trans fat,cholesterol, sodium, and so on. Most products have nonzero values for only a few of these optional fields.
 
-静态工厂和构造函数都有一个局限：它们不能对大量可选参数做很好的扩展。*Static factories and constructors shar a limitation: they do not scale well to large numbers of optional parameters.*
+静态工厂和构造函数都有一个局限：它们不能对大量可选参数做很好的扩展。*Static factories and constructors share a limitation: they do not scale well to large numbers of optional parameters.*
 
 以一个类为例，它表示包装食品上的营养标签。这些标签上有一些字段是必需的，如：净含量、毛重和每单位份量的卡路里，另有超过 20 个可选的字段，如：总脂肪、饱和脂肪、反式脂肪、胆固醇、钠等等。大多数产品只有这些可选字段中的少数，且具有非零值。*Consider the case of class representing the **Nutrition Facts** label that appears on packaged foods. These labels have a few required fields - serving size, servings per container, and calories per serving - and more than twenty optional fields - total fat, saturated fat, trans fat, cholesterol, sodium, and so on. Most products have nonzero values for only a few of these optional fields.*
 
@@ -12,7 +12,7 @@ What sort of constructors or static factories should you write for such a class?
 
 应该为这样的类编写什么种类的构造函数或静态工厂呢？*What sort of constructors or static factories should you write for such a class?*
 
-传统的方式是使用可伸缩构造函数，在这种模式中，只向构造函数提供必需的参数。即，向第一个构造函数提供单个可选参数，向第二个构造函数提供两个可选参数，以此类推，最后一个构造函数是具有所有可选参数的。*Traditionally, programmers have used the **telescoping** constructor pattern, in which you provide a constructor with only the required parameters, another with a single optional parameter, a third whith two optional parameters, and so on, **culminating** a constructor with all the optional parameters.*
+传统的方式是使用可伸缩构造函数，在这种模式中，只向构造函数提供必需的参数。即，向第一个构造函数提供单个可选参数，向第二个构造函数提供两个可选参数，以此类推，最后一个构造函数是具有所有可选参数的。*Traditionally, programmers have used the **telescoping** constructor pattern, in which you provide a constructor with only the required parameters, another with a single optional parameter, a third with two optional parameters, and so on, **culminating** a constructor with all the optional parameters.*
 
 这是它在实际应用中的样子。为了简洁起见，只展示具备四个可选字段的情况：*Heres's how it looks in practice. **For brevity's sake**, only four optional fields are shown.*
 
@@ -77,7 +77,7 @@ In short, **the telescoping constructor pattern works, but it is hard to write c
 
 A second alternative when you’re faced with many optional parameters in a constructor is the JavaBeans pattern, in which you call a parameterless constructor to create the object and then call setter methods to set each required parameter and each optional parameter of interest:
 
-当你在构造函数中遇到许多可选参数时，另一种选择是 JavaBean 模式，在这种模式中，你调用一个无参数的构造函数来创建对象，然后调用 setter 方法来设置每个所需的参数和每个感兴趣的可选参数：*A second **alternative** when you're faced with many optional parameters in a construcor is the JavaBeans pattern, in which you call a parameterless constructor to create the object and then call setter methods to set each required parameter and each optional parameter of interest:*
+当你在构造函数中遇到许多可选参数时，另一种选择是 JavaBean 模式，在这种模式中，你调用一个无参数的构造函数来创建对象，然后调用 setter 方法来设置每个所需的参数和每个感兴趣的可选参数：*A second **alternative** when you're faced with many optional parameters in a constructor is the JavaBeans pattern, in which you call a parameterless constructor to create the object and then call setter methods to set each required parameter and each optional parameter of interest:*
 
 ```java
 // JavaBeans Pattern - allows inconsistency, mandates mutability
@@ -119,7 +119,7 @@ Unfortunately, the JavaBeans pattern has serious disadvantages of its own. Becau
 
 因为构建是在多个调用之间进行的，所以 JavaBean 可能在构建的过程中处于不一致的状态。*Because construction is split across multiple calls, a JavaBean may be in an inconsistent state **partway** through its construction.*
 
-该类不能仅通过检查构造函数参数的有效性来强制一致性。在不一致的状态下尝试使用对象可能会导致错误的发生，而包含这些错误的代码很难调试。*The class does not have the option of enforing consistency merely by checking the validity of the constructor parameters. Attempting to use an object when its in an inconsistent state may cause failures that are **far removed from the code containing the bug<这些故障与包含bug的代码相距很远，而且难以调试>** and hence diffcult to debug.*
+该类不能仅通过检查构造函数参数的有效性来强制一致性。在不一致的状态下尝试使用对象可能会导致错误的发生，而包含这些错误的代码很难调试。*The class does not have the option of enforcing consistency merely by checking the validity of the constructor parameters. Attempting to use an object when its in an inconsistent state may cause failures that are **far removed from the code containing the bug<这些故障与包含bug的代码相距很远，而且难以调试>** and hence difficult to debug.*
 
 **far removed from 远离…，与…相距甚远**
 
@@ -127,7 +127,7 @@ Unfortunately, the JavaBeans pattern has serious disadvantages of its own. Becau
 
 It is possible to reduce these disadvantages by manually “freezing” the object when its construction is complete and not allowing it to be used until frozen, but this variant is unwieldy and rarely used in practice. Moreover, it can cause errors at runtime because the compiler cannot ensure that the programmer calls the freeze method on an object before using it.
 
-通过在对象构建完成时手动「冻结」对象，并在冻结之前不允许使用对象，可以减少这些缺陷，但是这种变通方式很笨拙，在实践中很少使用。*It is possible to reduce these disadvantages by manaully "freezing" the object when its construction is complete and not allowing it to be used until frozen, but this variant is **unwieldy** and rarely used in practice.*
+通过在对象构建完成时手动「冻结」对象，并在冻结之前不允许使用对象，可以减少这些缺陷，但是这种变通方式很笨拙，在实践中很少使用。*It is possible to reduce these disadvantages by manually "freezing" the object when its construction is complete and not allowing it to be used until frozen, but this variant is **unwieldy** and rarely used in practice.*
 
 此外，它可能在运行时导致错误，因为编译器不能确保程序员在使用对象之前调用它的 freeze 方法。*Moreover, it can cause errors at runtime because the complier cannot ensure that the programmer calls the freeze method on an object before using it.*
 
@@ -221,9 +221,9 @@ This client code is easy to write and, more importantly, easy to read. The Build
 
 Validity checks were omitted for brevity. To detect invalid parameters as soon as possible, check parameter validity in the builder’s constructor and methods.Check invariants involving multiple parameters in the constructor invoked by the build method. To ensure these invariants against attack, do the checks on object fields after copying parameters from the builder (Item 50). If a check fails, throw an IllegalArgumentException (Item 72) whose detail message indicates which parameters are invalid (Item 75).
 
-为了简洁，省略了有效性检查。为了尽快检测无效的参数，请检查构建器的构造函数和方法中的参数有效性。*Validity checks were omitted for brevity. To dectect invalid parameters as soon as possible, check parameter validity in the builder's constructor and methods.*
+为了简洁，省略了有效性检查。为了尽快检测无效的参数，请检查构建器的构造函数和方法中的参数有效性。*Validity checks were omitted for brevity. To detect invalid parameters as soon as possible, check parameter validity in the builder's constructor and methods.*
 
-检查构建方法调用的构造函数中涉及多个参数的不变量。*Check **invariants** involving mutiple parameters in the constructor invoked by the build method.*
+检查构建方法调用的构造函数中涉及多个参数的不变量。*Check **invariants** involving multiple parameters in the constructor invoked by the build method.*
 
 为了确保这些不变量不受攻击，在从构建器复制参数之后检查对象字段（[Item-50](/Chapter-8/Chapter-8-Item-50-Make-defensive-copies-when-needed.md)）。如果检查失败，抛出一个 IllegalArgumentException（[Item-72](/Chapter-10/Chapter-10-Item-72-Favor-the-use-of-standard-exceptions.md)），它的详细消息指示哪些参数无效（[Item-75](/Chapter-10/Chapter-10-Item-75-Include-failure-capture-information-in-detail-messages.md)）。*To ensure these invariants against attack, do the checks on object fields after copying parameters from the builder. If a check fails, thrown an IllegalArgumentException whose detail message indicates which parameters are invalid.*
 

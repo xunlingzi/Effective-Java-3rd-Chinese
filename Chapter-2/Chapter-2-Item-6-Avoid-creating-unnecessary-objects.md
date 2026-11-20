@@ -59,7 +59,7 @@ The problem with this implementation is that it relies on the String.matches met
 
 这个实现的问题是它依赖于 `String.matches` 方法。**虽然 String.matches 是检查字符串是否与正则表达式匹配的最简单方法，但它不适合在性能关键的情况下重复使用。** *The problem with this implementation is that it relies on the String.matches method. While String.matches is the easiest way to check if a string matches a regular expression, it's not suitable for repeated use in performance-critical situations.*
 
-问题在于，它在内部为正则表达式创建了一个 Pattern 实例，并且只使用一次，之后就进行垃圾收集了。创建一个 Pattern 实例是很昂贵的，因为它需要将正则表达式编译成有限的状态机。*The problem is that it **internally<内部地>** creates a Pattern instane for the regular expresision and uses it only once, after which it becomes **eligible<合格者，有资格的>** for garbage collection. Creating a Pattern instance is expensive because it requires compiling the regular expression into a finite state machine.*
+问题在于，它在内部为正则表达式创建了一个 Pattern 实例，并且只使用一次，之后就进行垃圾收集了。创建一个 Pattern 实例是很昂贵的，因为它需要将正则表达式编译成有限的状态机。*The problem is that it **internally<内部地>** creates a Pattern instance for the regular expression and uses it only once, after which it becomes **eligible<合格者，有资格的>** for garbage collection. Creating a Pattern instance is expensive because it requires compiling the regular expression into a finite state machine.*
 
 To improve the performance, explicitly compile the regular expression into a Pattern instance (which is immutable) as part of class initialization, cache it,and reuse the same instance for every invocation of the isRomanNumeral method:
 
@@ -97,7 +97,7 @@ When an object is immutable, it is obvious it can be reused safely, but there ar
 
 因为适配器的状态不超过其支持对象的状态，所以不需要为给定对象创建一个给定适配器的多个实例。*Because an adapter has no state beyond that of its backing object, there's no need to create more than one instance of a given adapter to a given object.*
 
-For example, the keySet method of the Map interface returns a Set view of the Map object, consisting ofall the keys in the map. Naively, it would seem that every call to keySet would have to create a new Set instance, but every call to keySet on a given Map object may return the same Set instance. Although the returned Set instance is typically mutable, all of the returned objects are functionally identical: when one of the returned objects changes, so do all the others, because they’re all backed by the same Map instance. While it is largely harmless to create multiple instances of the keySet view object, it is unnecessary and has no benefits.
+For example, the keySet method of the Map interface returns a Set view of the Map object, consisting of all the keys in the map. Naively, it would seem that every call to keySet would have to create a new Set instance, but every call to keySet on a given Map object may return the same Set instance. Although the returned Set instance is typically mutable, all of the returned objects are functionally identical: when one of the returned objects changes, so do all the others, because they’re all backed by the same Map instance. While it is largely harmless to create multiple instances of the keySet view object, it is unnecessary and has no benefits.
 
 例如，Map 接口的 keySet 方法返回 Map 对象的 Set 视图，其中包含 Map 中的所有键。*For example, the keySet method of the Map interface returns a Set view of the Map object, **consisting of<由…组成>** all the keys in the map.*
 

@@ -38,9 +38,9 @@ public class UtilityClass {
 
 Because the explicit constructor is private, it is inaccessible outside the class.The AssertionError isn’t strictly required, but it provides insurance in case the constructor is accidentally invoked from within the class. It guarantees the class will never be instantiated under any circumstances. This idiom is mildly counterintuitive because the constructor is provided expressly so that it cannot be invoked. It is therefore wise to include a comment, as shown earlier.
 
-因为显式构造函数是私有的，所以在类之外是不可访问的。AssertionError 不是严格要求的，但是它提供了保障，以防构造函数意外地被调用。它保证类在任何情况下都不会被实例化。*Beacause the explicit constructor is private, it is inaccessible to outside the class. The AssertionError isn't strictly required, but it provides **insurance<保障，保险>** in case the construtor is accidentally invoked from within the class. It guarantees the class will never be instantiated under any circumstances.*
+因为显式构造函数是私有的，所以在类之外是不可访问的。AssertionError 不是严格要求的，但是它提供了保障，以防构造函数意外地被调用。它保证类在任何情况下都不会被实例化。*Because the explicit constructor is private, it is inaccessible to outside the class. The AssertionError isn't strictly required, but it provides **insurance<保障，保险>** in case the constructor is accidentally invoked from within the class. It guarantees the class will never be instantiated under any circumstances.*
 
-这个习惯用法有点违反常规，因为构造函数是明确提供的，但不能调用它。因此，如上述代码所示，包含注释是明智的做法。*This idiom is midly **counterintuitive<违反直觉的>** because the constructor is provided **expressly<明确地>** so that it cannot be invoked. It is therefore **wise<明智的>** to include a comment, as shown earlier.*
+这个习惯用法有点违反常规，因为构造函数是明确提供的，但不能调用它。因此，如上述代码所示，包含注释是明智的做法。*This idiom is mildly **counterintuitive<违反直觉的>** because the constructor is provided **expressly<明确地>** so that it cannot be invoked. It is therefore **wise<明智的>** to include a comment, as shown earlier.*
 
 As a side effect, this idiom also prevents the class from being subclassed. All constructors must invoke a superclass constructor, explicitly or implicitly, and a subclass would have no accessible superclass constructor to invoke.
 

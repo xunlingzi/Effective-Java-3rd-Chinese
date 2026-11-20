@@ -6,9 +6,9 @@ A singleton is simply a class that is instantiated exactly once [Gamma95].Single
 
 单例是一个只实例化一次的类 [Gamma95]。单例通常表示无状态对象，比如函数（[Item-24](/Chapter-4/Chapter-4-Item-24-Favor-static-member-classes-over-nonstatic.md)）或系统组件，它们在本质上是唯一的。*A singleton is simply a class that is instantiated exactly once. Singletons typically represent either a stateless object such as a function or a system component that is **intrinsically<本质上>** unique.*
 
-**将一个类设计为单例会使它的客户端测试时变得困难，** 除非它实现了作为其类型的接口，否则无法用模拟实现来代替单例。*Making a class a singleton can make it diffcult to test its clients because it's impossible to substitute a mock implementation for a singleton unless it implements an interface that serves as its type.*
+**将一个类设计为单例会使它的客户端测试时变得困难，** 除非它实现了作为其类型的接口，否则无法用模拟实现来代替单例。*Making a class a singleton can make it difficult to test its clients because it's impossible to substitute a mock implementation for a singleton unless it implements an interface that serves as its type.*
 
-**substitue A for B： 用A代替B**
+**substitute A for B： 用A代替B**
 
 > [!note] 
 >
@@ -39,7 +39,7 @@ The private constructor is called only once, to initialize the public static fin
 
 私有构造函数只调用一次，用于初始化 public static final 修饰的 Elvis 类型字段 INSTANCE。*The private constructor is called only once, to initialize the public static final field Elvis.INSTANCE.*
 
-不使用 public 或 protected 的构造函数保证了「独一无二」的空间：一旦初始化了 Elvis 类，就只会存在一个 Elvis 实例，不多也不少。*The lack of a public or protected constructor guarantees a "monelvistic" universe: exactly one Elvis instance will exist once the Elvis class is initialized - no more, no less.*
+不使用 public 或 protected 的构造函数保证了「独一无二」的空间：一旦初始化了 Elvis 类，就只会存在一个 Elvis 实例，不多也不少。*The lack of a public or protected constructor guarantees a "monoelvistic" universe: exactly one Elvis instance will exist once the Elvis class is initialized - no more, no less.*
 
 客户端所做的任何事情都不能改变这一点，但有一点需要注意：拥有特殊权限的客户端可以借助 AccessibleObject.setAccessible 方法利用反射调用私有构造函数（[Item-65](/Chapter-9/Chapter-9-Item-65-Prefer-interfaces-to-reflection.md)）如果需要防范这种攻击，请修改构造函数，使其在请求创建第二个实例时抛出异常。*Nothing that a client does can change this, with one **caveat<警告，告诫>**: a privileged client can invoke the private constructor reflectively with the aid of the AccessibleObject.setAccessible method. If you need to defend against this attack, modify the constructor to make it throw an exception if it's asked to create a second instance.*
 
@@ -79,7 +79,7 @@ All calls to Elvis.getInstance return the same object reference, and no other El
 
 The main advantage of the public field approach is that the API makes it clear that the class is a singleton: the public static field is final, so it will always contain the same object reference. The second advantage is that it’s simpler.
 
-公共字段方法的主要优点是 API 明确了类是单例的：public static 修饰的字段是 final 的，因此它总是包含相同的对象引用。第二个优点是更简单。*The main advantage of the public field approach is that the API makes it clear that the class is a singleton: the public static field is final, so it will always contain the same object reference. The second advantage is that it's impler.*
+公共字段方法的主要优点是 API 明确了类是单例的：public static 修饰的字段是 final 的，因此它总是包含相同的对象引用。第二个优点是更简单。*The main advantage of the public field approach is that the API makes it clear that the class is a singleton: the public static field is final, so it will always contain the same object reference. The second advantage is that it's simpler.*
 
 One advantage of the static factory approach is that it gives you the flexibility to change your mind about whether the class is a singleton without changing its API. The factory method returns the sole instance, but it could be modified to return, say, a separate instance for each thread that invokes it. A second advantage is that you can write a generic singleton factory if your application requires it (Item 30). A final advantage of using a static factory is that a method reference can be used as a supplier, for example `Elvis::instance` is a `Supplier<Elvis>`. Unless one of these advantages is relevant, the public field approach is preferable.
 
@@ -89,7 +89,7 @@ One advantage of the static factory approach is that it gives you the flexibilit
 
 第二个优点是，如果应用程序需要的话，可以编写泛型的单例工厂（[Item-30](/Chapter-5/Chapter-5-Item-30-Favor-generic-methods.md)）。*A second advantage is that you can write a **generic<泛型，通用的>** singleton factory if your application requires it..*
 
-使用静态工厂的最后一个优点是方法引用能够作为一个提供者，例如 `Elvis::getInstance` 是 `Supplier<Elvis>` 的提供者。*A final advantage of using a static factory is that a mehtod reference can be used as a supplier, for example Elvis::getInstance is a Supplier\<Elvis\>.*
+使用静态工厂的最后一个优点是方法引用能够作为一个提供者，例如 `Elvis::getInstance` 是 `Supplier<Elvis>` 的提供者。*A final advantage of using a static factory is that a method reference can be used as a supplier, for example Elvis::getInstance is a Supplier\<Elvis\>.*
 
 除非能够与这些优点沾边，否则使用 public 字段的方式更可取。*Unless one of these advantage is relevant, the public field approach is preferable.*
 

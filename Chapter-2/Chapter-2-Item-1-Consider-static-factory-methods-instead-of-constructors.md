@@ -20,13 +20,13 @@ public static Boolean valueOf(boolean b) {
 
 Note that a static factory method is not the same as the Factory Method pattern from Design Patterns [Gamma95]. The static factory method described in this item has no direct equivalent in Design Patterns.
 
-要注意的是静态工厂方法与来自设计模式的工厂方法模式不同 [Gamma95]。*Note that a static facoty method is not the same as the Factory Method pattern form Design Patterns.*
+要注意的是静态工厂方法与来自设计模式的工厂方法模式不同 [Gamma95]。*Note that a static factory method is not the same as the Factory Method pattern form Design Patterns.*
 
 本条目中描述的静态工厂方法在设计模式中没有直接等价的方法。*The static factory method described in this item has no direct equivalent in Design Patterns.*
 
 A class can provide its clients with static factory methods instead of, or in addition to, public constructors. Providing a static factory method instead of a public constructor has both advantages and disadvantages.
 
-除了公共构造函数，一个类还可以通过静态工厂方法提供它的客户端。*A class can provided its clients with static facory methods instead of, or in addition to, public constructors.*
+除了公共构造函数，一个类还可以通过静态工厂方法提供它的客户端。*A class can provided its clients with static factory methods instead of, or in addition to, public constructors.*
 
 使用静态工厂方法而不是公共构造函数的方式既有优点也有缺点。*Providing a static factory method instead of a public constructor has both advatages and disadvantages.*
 
@@ -34,9 +34,9 @@ A class can provide its clients with static factory methods instead of, or in ad
 
 **静态工厂方法与构造函数相比的第一个优点，静态工厂方法有确切名称。** *One advantage of static factory methods is that, unlike constructors, they have names.*
 
-如果构造函数的参数本身并不能描述返回的对象，那么具有确切名称的静态工厂则更容易使用，生成的客户端代码也更容易阅读。*If the parameters to a constructor do not, **in and of themselves**, describe the object being returned, a static fatory with a well-chosen name is easier to use and the resulting client code easier to read.*
+如果构造函数的参数本身并不能描述返回的对象，那么具有确切名称的静态工厂则更容易使用，生成的客户端代码也更容易阅读。*If the parameters to a constructor do not, **in and of themselves**, describe the object being returned, a static factory with a well-chosen name is easier to use and the resulting client code easier to read.*
 
-例如，返回可能为素数的 BigInteger 类的构造函数 `BigInteger(int, int, Random)` 最好表示为名为 `BigInteger.probablePrime` 的静态工厂方法。（这个方法是在 Java 4 中添加的）*For example, the constructor BigInteger(int, int, Random), which returns a BigInteger that is probably prime, would have been better expressed as a static fatory method named BigInteger.probablePrime.*
+例如，返回可能为素数的 BigInteger 类的构造函数 `BigInteger(int, int, Random)` 最好表示为名为 `BigInteger.probablePrime` 的静态工厂方法。（这个方法是在 Java 4 中添加的）*For example, the constructor BigInteger(int, int, Random), which returns a BigInteger that is probably prime, would have been better expressed as a static factory method named BigInteger.probablePrime.*
 
 A class can have only a single constructor with a given signature. Programmers have been known to get around this restriction by providing two constructors whose parameter lists differ only in the order of their parameter types. This is a really bad idea. The user of such an API will never be able to remember which constructor is which and will end up calling the wrong one by mistake. People reading code that uses these constructors will not know what the code does without referring to the class documentation.
 
@@ -54,9 +54,9 @@ A class can have only a single constructor with a given signature. Programmers h
 
 Because they have names, static factory methods don’t share the restriction discussed in the previous paragraph. In cases where a class seems to require multiple constructors with the same signature, replace the constructors with static factory methods and carefully chosen names to highlight their differences.
 
-因为静态工厂方法有确切名称，所以它们没有前一段讨论的局限。*Because they have names, static factory methods don't share the restriction dicussed in the previous paragraph.*
+因为静态工厂方法有确切名称，所以它们没有前一段讨论的局限。*Because they have names, static factory methods don't share the restriction discussed in the previous paragraph.*
 
-如果一个类需要具有相同签名的多个构造函数，那么用静态工厂方法替换构造函数，并仔细选择名称以突出它们的区别。***In cases** where a class seems to require multiple constructors with the same signature, replace the constructors with static factory methods and carefully chosen names to highlight thire differences.*
+如果一个类需要具有相同签名的多个构造函数，那么用静态工厂方法替换构造函数，并仔细选择名称以突出它们的区别。***In cases** where a class seems to require multiple constructors with the same signature, replace the constructors with static factory methods and carefully chosen names to highlight there differences.*
 
 **A second advantage of static factory methods is that, unlike constructors,they are not required to create a new object each time they’re invoked.** This allows immutable classes (Item 17) to use preconstructed instances, or to cache instances as they’re constructed, and dispense them repeatedly to avoid creating unnecessary duplicate objects. The Boolean.valueOf(boolean) method illustrates this technique: it never creates an object. This technique is similar to the Flyweight pattern [Gamma95]. It can greatly improve performance if equivalent objects are requested often, especially if they are expensive to create.
 
@@ -66,7 +66,7 @@ Because they have names, static factory methods don’t share the restriction di
 
 `Boolean.valueOf(boolean)` 方法说明了这种技术：它从不创建对象。*The Boolean.valueOf(boolean) method illustrates this technique: it never creates an object.*
 
-这种技术类似于享元模式 [Gamma95]。如果经常请求相同的对象，特别是在创建对象的代价很高时，它可以极大地提高性能。*This technique is similar to the FlyWeight pattern. It can greatly improve performance if equivalent objects are requested often, especially if they are expensive to create.*
+这种技术类似于享元模式 [Gamma95]。如果经常请求相同的对象，特别是在创建对象的代价很高时，它可以极大地提高性能。*This technique is similar to the Flyweight pattern. It can greatly improve performance if equivalent objects are requested often, especially if they are expensive to create.*
 
 The ability of static factory methods to return the same object from repeated invocations allows classes to maintain strict control over what instances exist at any time. Classes that do this are said to be instance-controlled. There are several reasons to write instance-controlled classes. Instance control allows a class to guarantee that it is a singleton (Item 3) or noninstantiable (Item 4). Also,it allows an immutable value class (Item 17) to make the guarantee that no two equal instances exist: a.equals(b) if and only if a == b. This is the basis of the Flyweight pattern [Gamma95]. Enum types (Item 34) provide this guarantee.
 
@@ -84,13 +84,13 @@ The ability of static factory methods to return the same object from repeated in
 
 **A third advantage of static factory methods is that, unlike constructors,they can return an object of any subtype of their return type.** This gives you great flexibility in choosing the class of the returned object.
 
-**静态工厂方法与构造函数相比的第三个优点，可以通过静态工厂方法获取返回类型的任何子类的对象。** *A thrid advantage of static factory method is that, unlike constructors, they can return an object of any subtype of their return type.*
+**静态工厂方法与构造函数相比的第三个优点，可以通过静态工厂方法获取返回类型的任何子类的对象。** *A third advantage of static factory method is that, unlike constructors, they can return an object of any subtype of their return type.*
 
 这为选择返回对象的类提供了很大的灵活性。*This gives you great flexibility in choosing the class of the returned object.*
 
 One application of this flexibility is that an API can return objects without making their classes public. Hiding implementation classes in this fashion leads to a very compact API. This technique lends itself to interface-based frameworks (Item 20), where interfaces provide natural return types for static factory methods.
 
-这种灵活性的一个应用是 API 可以在不公开其类的情况下返回对象。*One application of this flexibility is that an API can return object without making their classes pulic.*
+这种灵活性的一个应用是 API 可以在不公开其类的情况下返回对象。*One application of this flexibility is that an API can return object without making their classes public.*
 
 以这种方式隐藏实现类会形成一个非常紧凑的 API。*Hiding implementation classes **in this fashion <在这种情况下>**  leads to a very compact API.*
 
@@ -172,7 +172,7 @@ There are three essential components in a service provider framework: a service 
 
 An optional fourth component of a service provider framework is a service provider interface, which describes a factory object that produce instances of the service interface. In the absence of a service provider interface, implementations must be instantiated reflectively (Item 65). In the case of JDBC, Connection plays the part of the service interface, DriverManager.registerDriver is the provider registration API, DriverManager.getConnection is the service access API, and Driver is the service provider interface.
 
-服务提供者框架的第四个可选组件是服务提供者接口，它描述了产生服务接口实例的工厂对象。*An optional fourth component of a service provider framework is a service provider interface, which describes a fatory object that produce instances of the service interface.*
+服务提供者框架的第四个可选组件是服务提供者接口，它描述了产生服务接口实例的工厂对象。*An optional fourth component of a service provider framework is a service provider interface, which describes a factory object that produce instances of the service interface.*
 
 在没有服务提供者接口的情况下，必须以反射的方式实例化实现（[Item-65](/Chapter-9/Chapter-9-Item-65-Prefer-interfaces-to-reflection.md)）。*In the absence of a service provider interface, implementations must be instantiated reflectively.*
 
@@ -198,7 +198,7 @@ There are many variants of the service provider framework pattern. For example, 
 
 它们在 API 文档中不像构造函数那样引人注目，因此很难弄清楚如何实例化一个只提供静态工厂方法而没有构造函数的类。*They do not stand out in API documentation in the way that constructors do, so it can be difficult to figure out how to instantiate a class that provides static factory methods instead of constructors.*
 
-Javadoc 工具总有一天会关注到静态工厂方法。与此同时，你可以通过在类或接口文档中对静态工厂方法多加留意，以及遵守通用命名约定的方式来减少这个困扰。*The Javadoc tool may someday draw attention to static factory method. In the meantime, you can reduce this problem by drawing attention to static factories in class or interface documentation and by **adhering to<遵守，坚持>** common nameing **conventions**.*
+Javadoc 工具总有一天会关注到静态工厂方法。与此同时，你可以通过在类或接口文档中对静态工厂方法多加留意，以及遵守通用命名约定的方式来减少这个困扰。*The Javadoc tool may someday draw attention to static factory method. In the meantime, you can reduce this problem by drawing attention to static factories in class or interface documentation and by **adhering to<遵守，坚持>** common naming **conventions**.*
 
 下面是一些静态工厂方法的常用名称。这个列表还远不够详尽：*Here are some common names for static factory methods. This list is far from **exhaustive<详尽的>**.*
 

@@ -4,7 +4,7 @@
 
 If you switched from a language with manual memory management, such as C or C++, to a garbage-collected language such as Java, your job as a programmer was made much easier by the fact that your objects are automatically reclaimed when you’re through with them. It seems almost like magic when you first experience it. It can easily lead to the impression that you don’t have to think about memory management, but this isn’t quite true.
 
-如果你从需要手动管理内存的语言（如 C 或 c++）切换到具有垃圾回收机制的语言（如 Java），当你使用完对象后，会感觉程序员工作轻松很多。*If you switched from a language with manual memory management, such as C or C++, to a grabage-collected language such as Java, you job as a programmer was made much easier by the fact that your objects are automatically reclaimed when you're **through with<完成>** them.*
+如果你从需要手动管理内存的语言（如 C 或 c++）切换到具有垃圾回收机制的语言（如 Java），当你使用完对象后，会感觉程序员工作轻松很多。*If you switched from a language with manual memory management, such as C or C++, to a garbage-collected language such as Java, you job as a programmer was made much easier by the fact that your objects are automatically reclaimed when you're **through with<完成>** them.*
 
 当你第一次体验它的时候，它几乎就像魔术一样。这很容易让人觉得你不需要考虑内存管理，但这并不完全正确。*It seems almost like magic when you first experience. It can easily lead to the impression that you don't have to think about memory management, but this isn't quite true.*
 
@@ -52,7 +52,7 @@ There’s nothing obviously wrong with this program (but see Item 29 for a gener
 
 这个程序没有明显的错误（但是通用版本请参阅 [Item-29](/Chapter-5/Chapter-5-Item-29-Favor-generic-types.md)）。你可以对它进行详尽的测试，它会以优异的成绩通过所有的测试，但是有一个潜在的问题。*There's nothing obviously wrong with this program (but see Item 29 for a generic version). You could test it **exhaustively<详尽地，彻底地>**, and it would pass every test with **flying colors<出色的成绩或表现>**, but there's a problem **lurking<潜伏>**.*
 
-简单地说，该程序有一个「内存泄漏」问题，由于垃圾收集器活动的增加或内存占用的增加，它可以悄无声息地表现为性能的降低。在极端情况下，这种内存泄漏可能导致磁盘分页，甚至出现 OutOfMemoryError 程序故障，但这种故障相对少见。***Loosely<宽松地>** speaking, the program has a "memory leak", which can silently manifest itself as reduced performance due to increased garbage collector activity or increased memory footprint. In extreme cases, such memory leak can cause disk paging and even grogram failure with OutOfMemoryError, but such failures are relatively rare.*
+简单地说，该程序有一个「内存泄漏」问题，由于垃圾收集器活动的增加或内存占用的增加，它可以悄无声息地表现为性能的降低。在极端情况下，这种内存泄漏可能导致磁盘分页，甚至出现 OutOfMemoryError 程序故障，但这种故障相对少见。***Loosely<宽松地>** speaking, the program has a "memory leak", which can silently manifest itself as reduced performance due to increased garbage collector activity or increased memory footprint. In extreme cases, such memory leak can cause disk paging and even program failure with OutOfMemoryError, but such failures are relatively rare.*
 
 So where is the memory leak? If a stack grows and then shrinks, the objects that were popped off the stack will not be garbage collected, even if the program using the stack has no more references to them. This is because the stack maintains obsolete references to these objects. An obsolete reference is simply a reference that will never be dereferenced again. In this case, any references outside of the “active portion” of the element array are obsolete. The active portion consists of the elements whose index is less than size.
 
@@ -64,7 +64,7 @@ Memory leaks in garbage-collected languages (more properly known as unintentiona
 
 垃圾收集语言中的内存泄漏（更确切地说是无意的对象保留）是暗藏的风险。如果无意中保留了对象引用，那么对象不仅被排除在垃圾收集之外，该对象引用的任何对象也被排除在外，依此类推。*Memory leaks in garbage-collected languages (more **properly<适当地>** known as unintentional object retentions) are insidious. If an object reference is unintentionally retained, not only is that object excluded from garbage collection, but so too are any objects referenced by that object, and so on.*
 
-即使只是无意中保留了一些对象引用，许多许多的对象也可能被阻止被垃圾收集，从而对性能产生潜在的巨大影响。*Even if only a few object references are unintentionally retained, many, many objects may be prevented from being garbage collected, with **potentially<可能地，潜在地>** large effects on perfermance.*
+即使只是无意中保留了一些对象引用，许多许多的对象也可能被阻止被垃圾收集，从而对性能产生潜在的巨大影响。*Even if only a few object references are unintentionally retained, many, many objects may be prevented from being garbage collected, with **potentially<可能地，潜在地>** large effects on performance.*
 
 The fix for this sort of problem is simple: null out references once they become obsolete. In the case of our Stack class, the reference to an item becomes obsolete as soon as it’s popped off the stack. The corrected version of the pop method looks like this:
 
@@ -94,7 +94,7 @@ So when should you null out a reference? What aspect of the Stack class makes it
 
 那么，什么时候应该取消引用呢？Stack 类的哪些方面容易导致内存泄漏？简单地说，它管理自己的内存。*So when should you null out a reference? What aspect of the Stack class makes it susceptible to memory leaks? Simply put, it manages its own memory.*
 
-存储池包含元素数组的元素（对象引用单元，而不是对象本身）数组的活动部分（如前面所定义的）中的元素被分配，而数组其余部分中的元素是空闲的。*The storage pool consists of the elements of the elements array (the object reference cells, not the objects themseleves). The elements in the active portion of the array ( as defined earlier) are allocated, and those in the **remainder<剩余，余数>** of the array are free.*
+存储池包含元素数组的元素（对象引用单元，而不是对象本身）数组的活动部分（如前面所定义的）中的元素被分配，而数组其余部分中的元素是空闲的。*The storage pool consists of the elements of the elements array (the object reference cells, not the objects themselves). The elements in the active portion of the array ( as defined earlier) are allocated, and those in the **remainder<剩余，余数>** of the array are free.*
 
 垃圾收集器没有办法知道这一点；对于垃圾收集器，元素数组中的所有对象引用都同样有效。只有程序员知道数组的非活动部分不重要。*The garbage collector has no way of knowing this; to the garbage collector, all of the object references in the elements array are equally valid. Only the programmer knows that the inactive portion of the array is unimportant.*
 
@@ -108,7 +108,7 @@ Another common source of memory leaks is caches. Once you put an object referenc
 
 另一个常见的内存泄漏源是缓存。一旦将对象引用放入缓存中，就很容易忘记它就在那里，并且在它变得无关紧要之后很久仍将它留在缓存中。*Another common source of memory leaks is caches. Once you put an object reference into a cache, it's easy to forget that it's there and leave it in the cache long after it becomes irrelevant.*
 
-有几个解决这个问题的办法。如果你非常幸运地实现了一个缓存，只要缓存外有对其键的引用，那么就将缓存表示为 WeakHashMap；当条目过时后，条目将被自动删除。*There are serveral solutions to this problem. If you're lucky enough to implement a cache for which entry is relevant exactly **so long as<只要>** there are references to its key outside of the cache, represent the cache as a WeakHashMap; entries will be removed automatically after they become abolete.*
+有几个解决这个问题的办法。如果你非常幸运地实现了一个缓存，只要缓存外有对其键的引用，那么就将缓存表示为 WeakHashMap；当条目过时后，条目将被自动删除。*There are several solutions to this problem. If you're lucky enough to implement a cache for which entry is relevant exactly **so long as<只要>** there are references to its key outside of the cache, represent the cache as a WeakHashMap; entries will be removed automatically after they become obsolete.*
 
 > [!note]
 >
@@ -120,13 +120,13 @@ More commonly, the useful lifetime of a cache entry is less well defined, with e
 
 更常见的情况是，缓存条目的有效生存期定义不太好，随着时间的推移，条目的价值会越来越低。*More commonly, the useful lifetime of a cache entry is less well defined, with entries becoming less valuable **over time<随着时间的推移>**.*
 
-在这种情况下，缓存偶尔应该清理那些已经停用的条目。这可以通过后台线程（可能是 ScheduledThreadPoolExecutor）或向缓存添加新条目时顺便完成。*Under these circumstances, the cache should occasionally be **cleansed<cleanse, 清洁，净化>** of entries that have fallen into disuse. This can be done by a background thred (prehaps a ScheduledThreadPoolExecutor) or as a side effect of adding new entries to the cache.*
+在这种情况下，缓存偶尔应该清理那些已经停用的条目。这可以通过后台线程（可能是 ScheduledThreadPoolExecutor）或向缓存添加新条目时顺便完成。*Under these circumstances, the cache should occasionally be **cleansed<cleanse, 清洁，净化>** of entries that have fallen into disuse. This can be done by a background thread (perhaps a ScheduledThreadPoolExecutor) or as a side effect of adding new entries to the cache.*
 
 LinkedHashMap 类通过其 removeEldestEntry 方法简化了后一种方法。对于更复杂的缓存，你可能需要直接使用 java.lang.ref。*The LinkedHashMap class **facilitates<促进，帮助，使…容易>** the latter approach with its removeEldestentry method. For more sophisticated caches, you may need to use java.lang.ref directly.*
 
 **A third common source of memory leaks is listeners and other callbacks.** If you implement an API where clients register callbacks but don’t deregister them explicitly, they will accumulate unless you take some action. One way to ensure that callbacks are garbage collected promptly is to store only weak references to them, for instance, by storing them only as keys in a WeakHashMap.
 
-**内存泄漏的第三个常见来源是侦听器和其他回调。** 如果你实现了一个 API，其中客户端注册回调，但不显式取消它们，除非你采取一些行动，否则它们将累积。*A thrid common source of memory leaks is listeners and other callbacks. If you implement an API where clients register callbacks but don't deregister them explicitly, they will accumulate unless you take some action.*
+**内存泄漏的第三个常见来源是侦听器和其他回调。** 如果你实现了一个 API，其中客户端注册回调，但不显式取消它们，除非你采取一些行动，否则它们将累积。*A third common source of memory leaks is listeners and other callbacks. If you implement an API where clients register callbacks but don't deregister them explicitly, they will accumulate unless you take some action.*
 
 确保回调被及时地垃圾收集的一种方法是仅存储对它们的弱引用，例如，将它们作为键存储在 WeakHashMap 中。*One way to ensure that callbacks are garbage collected **promptly<及时地，迅速地>** is to store only weak references to them, for instance, by storing them only as keys in WeakHashMap.*
 
