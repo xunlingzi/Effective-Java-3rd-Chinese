@@ -1,6 +1,8 @@
+# Effective-Java-3rd-Chinese
+
 基于 [Effective-Java-3rd-edition-Chinese-English-bilingual](https://github.com/clxering/Effective-Java-3rd-edition-Chinese-English-bilingual)
 
-原版翻译错误较多，在此基础上做一些修订和添加一些注释
+原版翻译错误过多，在此基础上做一些修订和添加一些方便理解的注释。
 
 
 

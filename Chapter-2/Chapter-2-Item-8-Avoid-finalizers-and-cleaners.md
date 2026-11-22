@@ -68,6 +68,8 @@ Finalizers have a serious security problem: they open your class up to finalizer
 
 Finalizer机制有一个严重的安全问题：它们使你的类容易受到Finalizer攻击。Finalizer攻击背后的思想很简单：如果从构造函数或它的序列化等价物（readObject 和 readResolve 方法（[Item-12](/Chapter-3/Chapter-3-Item-12-Always-override-toString.md)））抛出一个异常，恶意子类的Finalizer就可以运行在部分本应该 “中途夭折” 的构造对象上。*Finalizers have a serious security problem: they open your class up to finalizer attacks. The idea behind a finalizer attack is simple: If an exception is thrown from a constructor or its serialization equivalents - the readObject and readResolve methods (Chapter 12) - the finalizer of a malicious subclass can run on the partially constructed object that should have "**died on the vine**".*
 
+> [!note]
+>
 > "Die on the vine" 是一个英语习语，字面意思是“在藤上死亡”，通常用来形容一种事物或人未能达到预期的潜力或成功，而是在尚未成熟或发挥价值之前就失败了。
 
 这个Finalizer可以在静态字段中记录对对象的引用，防止它被垃圾收集。一旦记录了格式错误的对象，就可以简单地调用该对象上的任意方法，这些方法一开始就不应该被允许存在。*This finalizer can record a reference to the object in a static filed, preventing it from being garbage collected. Once the malformed object has been recorded, it is a simple matter to invoke arbitrary methods on this object that should never have been allowed to exist in the first place.*
@@ -84,17 +86,21 @@ So what should you do instead of writing a finalizer or cleaner for a class whos
 
 So what, if anything, are cleaners and finalizers good for? They have perhaps two legitimate uses. One is to act as a safety net in case the owner of a resource neglects to call its close method. While there’s no guarantee that the cleaner or finalizer will run promptly (or at all), it is better to free the resource late than never if the client fails to do so. If you’re considering writing such a safety-net finalizer, think long and hard about whether the protection is worth the cost.Some Java library classes, such as FileInputStream,FileOutputStream, ThreadPoolExecutor, and java.sql.Connection, have finalizers that serve as safety nets.
 
-那么，Cleaner和Finalizer有什么用呢？它们可能有两种合法用途。一种是充当一个安全网，以防资源的所有者忽略调用它的 close 方法。虽然不能保证Cleaner或Finalizer将立即运行（或根本不运行），但如果客户端没有这样做，最好是延迟释放资源。如果你正在考虑编写这样一个安全网络Finalizer，那就好好考虑一下这种保护是否值得。一些 Java 库类，如 FileInputStream、FileOutputStream、ThreadPoolExecutor 和 java.sql.Connection，都有Finalizer作为安全网。
+那么，Cleaner和Finalizer有什么用呢？它们可能有两种合理用途。一种是充当一个安全网，以防资源的所有者忽略调用它的 close 方法。虽然不能保证Cleaner或Finalizer将立即运行（或根本不运行），如果客户端未能及时释放资源，那么晚释放资源总比不释放要好。*So what, if anything, are cleaners and finalizers good for? They have perhaps two legitimate uses. One is to act as a safety net incase the owner of a resource neglects to call its close method. While there's no guarantee that the cleaner or finalizer will run promptly (or at all), it is better to free the resource late than never if the client fails to do so.*
+
+如果你正在考虑编写这样一个安全网络Finalizer，那就仔细考虑一下这种保护是否值得。一些 Java 库类，如 FileInputStream、FileOutputStream、ThreadPoolExecutor 和 java.sql.Connection，都有Finalizer作为安全网。*If you're considering writing such a safety-net finalizer, think long and hard about whether the protection is worth the cost. Some Java library classes, such as FileInputStream, FileOutputStream, ThreadPoolExecutor, and java.sql.Connection, have finalizers that serve as safety nets.*
 
 A second legitimate use of cleaners concerns objects with native peers. A native peer is a native (non-Java) object to which a normal object delegates via native methods. Because a native peer is not a normal object, the garbage collector doesn’t know about it and can’t reclaim it when its Java peer is reclaimed. A cleaner or finalizer may be an appropriate vehicle for this task,assuming the performance is acceptable and the native peer holds no critical resources. If the performance is unacceptable or the native peer holds resources that must be reclaimed promptly, the class should have a close method, as described earlier.
 
-清洁器的第二个合法使用涉及到与本机对等体的对象。本机对等点是普通对象通过本机方法委托给的本机（非 java）对象。因为本机对等点不是一个正常的对象，垃圾收集器不知道它，并且不能在回收 Java 对等点时回收它。如果性能是可接受的，并且本机对等体不持有任何关键资源，那么更清洁或Finalizer可能是完成这项任务的合适工具。如果性能不可接受，或者本机对等体持有必须立即回收的资源，则类应该具有前面描述的关闭方法。
+Cleaner的第二个合理使用涉及到具有本地对等体的对象。本地对等体是一个普通对象通过本地方法委托的本地（非 java）对象。因为本地对等体不是一个正常的Java对象，垃圾收集器并不知道它，所以不能在回收 Java 对象时回收它。*A second legitimate use of cleaners concerns objects with native peers. A native peer is a native (non-Java) object to which a normal object delegates via native methods. Because a native peer is not a normal object, the garbage collector doesn't know about it and can't reclaim it when its Java peer is reclaimed.*
+
+如果性能是可接受的，并且本地对等体不持有任何关键资源，那么Cleaner或Finalizer可能是完成这项任务的合适工具。如果性能不可接受，或者本地对等体持有必须立即回收的资源，则类应该具有一个 close 方法，如前面所述。*A cleaner or finalizer my be an appropriate vehicle for this task, assuming the performance is acceptable and the native peer holds no critical resources. If the performance is unacceptable or the native peer holds resources that must be reclaimed promptly, the class should have a close method, as described earlier.*
 
 Cleaners are a bit tricky to use. Below is a simple Room class demonstrating the facility. Let’s assume that rooms must be cleaned before they are reclaimed.The Room class implements AutoCloseable; the fact that its automatic cleaning safety net uses a cleaner is merely an implementation detail. Unlike finalizers, cleaners do not pollute a class’s public API:
 
-Cleaner的使用有些棘手。下面是一个简单的 Room 类，展示了这个设施。让我们假设房间在回收之前必须被清理。Room 类实现了 AutoCloseable；它的自动清洗安全网使用了Cleaner，这只是一个实现细节。与Finalizer不同，Cleaner不会污染类的公共 API：
+Cleaner的使用有些棘手。下面是一个简单的 Room 类展示了这个功能。让我们假设room对象在回收之前必须被清理干净。Room 类实现了 AutoCloseable；它的自动清理安全网使用了Cleaner机制，这仅仅是一个实现细节。与Finalizer不同，Cleaner不会污染一个类的公共 API：*Cleaners are a bit tricky to use. Below is simple Room class demonstrating the facility. Let's assume that rooms must be cleaned before they are reclaimed. The Room class implements AutoCloseable; the fact that its automatic cleaning safety net uses a cleaner is merely an implementation detail. Unlike finalizers, cleaners do not pollute a class's public API.*
 
-```
+```java
 import sun.misc.Cleaner;
 
 // An autocloseable class using a cleaner as a safety net
@@ -136,17 +142,29 @@ public class Room implements AutoCloseable {
 
 The static nested State class holds the resources that are required by the cleaner to clean the room. In this case, it is simply the numJunkPiles field,which represents the amount of mess in the room. More realistically, it might be a final long that contains a pointer to a native peer. State implements Runnable, and its run method is called at most once, by the Cleanable that we get when we register our State instance with our cleaner in the Room constructor. The call to the run method will be triggered by one of two things:Usually it is triggered by a call to Room’s close method calling Cleanable’s clean method. If the client fails to call the close method by the time a Room instance is eligible for garbage collection, the cleaner will (hopefully) call State’s run method.
 
-静态嵌套 State 类持有清洁器清洁房间所需的资源。在这种情况下，它仅仅是 numJunkPiles 字段，表示房间的混乱程度。更实际地说，它可能是最后一个包含指向本机对等点的 long 指针。State 实现了 Runnable，它的运行方法最多被调用一次，由我们在 Room 构造器中向 cleaner 实例注册状态实例时得到的 Cleanable 调用。对 run 方法的调用将由以下两种方法之一触发：通常是通过调用 Room 的 close 方法来触发，调用 Cleanable 的 clean 方法。如果当一个 Room 实例有资格进行垃圾收集时，客户端没有调用 close 方法，那么Cleaner将调用 State 的 run 方法（希望如此）。
+静态嵌套 State 类持有Cleaner清洁房间所需的资源。在这里，它仅仅是 numJunkPiles 字段，表示房间的混乱程度。更实际地说，它可能是一个 final 修饰的 long 类型的指向本地对等体的指针。*The static **nested<嵌套的>** State class holds the resources that are required by the cleaner to clean the room. In this case, it is simply the numJunkPiles field, which represents the amount for mess in the room. More realistically, it might be a final long that contains a pointer to a native peer.*
+
+> [!note]
+>
+> 嵌套类分为两种：静态的和非静态的。用 static 关键字来声明的嵌套类，称为静态嵌套类（Static Nested Class）。非静态嵌套类（Non-Static Nested Class），又称为内部类（Inner Class）。
+>
+> 静态嵌套类不能访问封闭类（Enclosing Class）/ 外部类（Outer Class）的非静态成员。
+
+State 类实现了 Runnable 接口，它的 run 方法最多被调用一次，由我们在 Room 构造函数中向 Cleaner 注册 State 实例时获得的 Cleanable 调用。对 run 方法的调用将由以下两种方法之一触发：通常是通过调用 Room 的 close 方法，其内部调用 Cleanable 的 clean 方法触发。*State implements Runnable, and its run method is called a t most once, by the Cleanable that we get when we register our State instance with our cleaner in the Room constructor. The call to the run method will be triggered by one of two things: Usually it is triggered by a call to Room's close method calling Cleanable's clean method.*
+
+如果客户端在Room实例符合垃圾收集条件时未能调用close方法，则Cleaner将（希望如此）调用State的run方法。*If the client fails to call the close method by the time a Room instance is eligible for garbage collection, the cleaner will (hopefully) call State's run method.*
 
 It is critical that a State instance does not refer to its Room instance. If it did, it would create a circularity that would prevent the Room instance from becoming eligible for garbage collection (and from being automatically cleaned).Therefore, State must be a static nested class because nonstatic nested classes contain references to their enclosing instances (Item 24). It is similarly inadvisable to use a lambda because they can easily capture references to enclosing objects.
 
-状态实例不引用其 Room 实例是非常重要的。如果它这样做了，它将创建一个循环，以防止 Room 实例有资格进行垃圾收集（以及自动清理）。因此，状态必须是一个静态嵌套类，因为非静态嵌套类包含对其封闭实例的引用（[Item-24](/Chapter-4/Chapter-4-Item-24-Favor-static-member-classes-over-nonstatic.md)）。同样不建议使用 lambda，因为它们可以很容易地捕获对包围对象的引用。
+State 实例不引用其 Room 实例是非常重要的。如果它引用了，它将创建一个循环，阻止 Room 实例符合垃圾回收的条件（并进行自动清理）。*It is critical that a State instance does not refer to its Room instance. If it did, it would create a circularity that would prevent the Room instance from becoming eligible for garbage collection (and from being automatically cleaned).*
+
+因此，State 类必须是一个静态嵌套类，因为非静态嵌套类包含对其封闭实例的引用（[Item-24](/Chapter-4/Chapter-4-Item-24-Favor-static-member-classes-over-nonstatic.md)）。同样不建议使用 lambda，因为它们可以很容易捕获对封闭对象的引用。*Therefore, State must be a static nested class because nonstatic nested classes contain references to their enclosing instances. It is similarly inadvisable to use a lambda because they can easily capture references to enclosing objects.*
 
 As we said earlier, Room’s cleaner is used only as a safety net. If clients surround all Room instantiations in try-with-resource blocks, automatic cleaning will never be required. This well-behaved client demonstrates that behavior:
 
-就像我们之前说的，Room 类的Cleaner只是用作安全网。如果客户端将所有 Room 实例包围在带有资源的 try 块中，则永远不需要自动清理。这位表现良好的客户端展示了这种做法：
+就像我们之前说的，Room 类的Cleaner仅仅作为一个安全网。如果客户端将所有 Room 实例包围在 try-with-resources 块中，则永远不需要自动清理。一个表现良好的客户端如下所示：*As we said earlier, Room's cleaner is used only as a safety net. If clients surround all Room instantiations in try-with-resource blocks, automatic cleaning will never be required. This well-behaved client demonstrates that behavior:*
 
-```
+```java
 public class Adult {
     public static void main(String[] args) {
         try (Room myRoom = new Room(7)) {
@@ -158,9 +176,9 @@ public class Adult {
 
 As you’d expect, running the Adult program prints Goodbye, followed by Cleaning room. But what about this ill-behaved program, which never cleans its room?
 
-如你所料，运行 Adult 程序打印「Goodbye」，然后是打扫房间。但这个从不打扫房间的不守规矩的程序怎么办？
+正如你所预料的，运行 Adult 程序打印「Goodbye」，随后是 [Cleaning room]。但是这个从不清理房间的行为不端的程序呢？*As you'd expect, running the Adult program prints Goodbye, followed by Cleaning room. But what about this ill-behaved program, which never cleans its room?*
 
-```
+```java
 public class Teenager {
     public static void main(String[] args) {
         new Room(99);
@@ -171,9 +189,16 @@ public class Teenager {
 
 You might expect it to print Peace out, followed by Cleaning room, but on my machine, it never prints Cleaning room; it just exits. This is the unpredictability we spoke of earlier. The Cleaner spec says, “The behavior of cleaners during System.exit is implementation specific. No guarantees are made relating to whether cleaning actions are invoked or not.” While the spec does not say it, the same holds true for normal program exit. On my machine,adding the line System.gc() to Teenager’s main method is enough to make it print Cleaning room prior to exit, but there’s no guarantee that you’ll see the same behavior on your machine.In summary, don’t use cleaners, or in releases prior to Java 9, finalizers,except as a safety net or to terminate noncritical native resources. Even then,beware the indeterminacy and performance consequences.
 
-你可能期望它打印出「Peace out」，然后打扫房间，但在我的机器上，它从不打扫房间；它只是退出。这就是我们之前提到的不可预测性。Cleaner 规范说：「在 System.exit 中，清洁器的行为是特定于实现的。不保证清理操作是否被调用。」虽然规范没有说明，但对于普通程序退出来说也是一样。在我的机器上，将 System.gc() 添加到 Teenager 的主要方法中就足以让它在退出之前打扫房间，但不能保证在其他机器上看到相同的行为。总之，不要使用清洁器，或者在 Java 9 之前的版本中使用Finalizer，除非是作为安全网或终止非关键的本机资源。即便如此，也要小心不确定性和性能后果。
+你可能期望它打印出「Peace out」，然后是 [Cleaning room]，但在我的机器上，它从不打印 [Cleaning room]；仅仅是程序直接退出。这就是我们之前提到的不可预测性。*You might expect it to print Peace out, followed by Cleaning room, but on my machine, it never prints Cleaning room; it just exits. This is the unpredictability we spoke of earlier.*
+
+Cleaner 规范说：「Cleaner 在 `System.exit` 期间的行为取决于具体实现。规范不保证清洁动作是否会被调用。」虽然规范没有说明，但对于正常程序退出来说也是如此。*The Cleaner **spec<规格，规范>** says, "The behavior or cleaners during System.exit is implementation specific. No guarantees are made relating to whether cleaning actions are invoked or not." While the spec does not say it, the same holds true for normal program exit.*
+
+在我的机器上，将 System.gc() 添加到 Teenager 的 main 方法中就足以让它在退出之前打印 [Cleaning room]，但不能保证在你的机器上会看到相同的行为。*On my machine, adding the line System.gc() to Teenager's main method is enough to make it print Cleaning room prior to exit, but there's no guarantee that you'll see the same behavior on your machine.*
+
+总之，不要使用Cleaner，或者在 Java 9 之前的版本中使用Finalizer，除非是作为安全网或终止非关键的本地资源。即便如此，也要小心不确定性和性能影响。*In summary, don't use cleaners, or in releases prior to Java 9, finalizers, except as a safety net or to terminate noncritical native resources. Even then, beware the **indeterminacy<不确定性>** and performance consequences.*
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-2/Chapter-2-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 7: Eliminate obsolete object references（排除过时的对象引用）](/Chapter-2/Chapter-2-Item-7-Eliminate-obsolete-object-references.md)**
 - **Next Item（下一条目）：[Item 9: Prefer try with resources to try finally（使用 try-with-resources 优于 try-finally）](/Chapter-2/Chapter-2-Item-9-Prefer-try-with-resources-to-try-finally.md)**
